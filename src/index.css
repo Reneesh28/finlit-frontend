@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors - Gamified & Bright */
+  --color-primary: #58cc02;
+  /* Duolingo Green - Savings/Growth */
+  --color-primary-dark: #46a302;
+  --color-secondary: #2b70c9;
+  /* Trust Blue */
+  --color-accent: #a855f7;
+  /* Purple - AI Intelligence */
+  --color-warning: #ff4b4b;
+  /* Red */
+  --color-highlight: #ffc800;
+  /* Yellow */
+  --color-success: #58cc02;
+
+  /* Backgrounds */
+  --color-bg-base: #ffffff;
+  --color-bg-soft: #f7f7f7;
+
+  /* Dark Mode specific (from guide) */
+  --color-dark-primary: #0f172a;
+  --color-dark-secondary: #1e293b;
+  --color-dark-card: #111827;
+  --color-dark-elevated: #1f2937;
+  --color-dark-border: #334155;
+  --color-dark-divider: #1e293b;
+
+  /* Borders & Shadows */
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-bright: 0 4px 0px 0px rgba(0, 0, 0, 0.1);
+  /* Duolingo-style bottom "border" shadow */
+
+  /* Animations */
+  --animate-bounce-subtle: bounce-subtle 2s infinite;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes bounce-subtle {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-bg-soft text-slate-900 font-sans antialiased transition-colors duration-300;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Apply dark mode styles to document */
+  .dark body {
+    @apply bg-dark-primary text-slate-50;
+  }
+}
+
+@layer components {
+  .btn-shadow {
+    box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-shadow:active {
+    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2);
+    transform: translateY(2px);
+  }
+}
