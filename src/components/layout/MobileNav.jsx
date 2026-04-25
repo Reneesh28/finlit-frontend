@@ -1,15 +1,15 @@
 import { NavLink } from "react-router-dom";
-import { Home, BookOpen, ReceiptText, MessageSquare, PieChart, User } from "lucide-react";
+import { Home, BookOpen, ReceiptText, MessageSquare, PieChart, User, Trophy } from "lucide-react";
 import { cn } from "../../utils/cn";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: BookOpen, label: "Learn", path: "/learn" },
-  { icon: ReceiptText, label: "History", path: "/transactions" },
+  { icon: Trophy, label: "Rank", path: "/leaderboard" },
   { icon: MessageSquare, label: "Coach", path: "/chat" },
-  { icon: PieChart, label: "Insights", path: "/insights" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
+
 
 export const MobileNav = () => {
   return (

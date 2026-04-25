@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Wallet, TrendingUp, CreditCard, Sparkles, ArrowRight, Award, Zap, CheckCircle2 } from "lucide-react";
+import { Wallet, TrendingUp, CreditCard, Sparkles, ArrowRight, Award, Zap, CheckCircle2, XCircle, Brain } from "lucide-react";
+
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { StatCard } from "../../components/ui/StatCard";
@@ -70,7 +71,91 @@ export default function Dashboard() {
         />
       </section>
 
+      {/* Knowledge & Analytics Section */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Category Accuracy (Bar Chart) */}
+        <Card variant="elevation" className="p-8 space-y-6">
+          <div className="flex justify-between items-end">
+            <div className="space-y-1">
+              <h3 className="text-xl font-black text-slate-800 dark:text-white transition-colors">Knowledge Breakdown</h3>
+              <p className="text-sm font-bold text-slate-400 dark:text-slate-500 transition-colors">Accuracy by category</p>
+            </div>
+            <Badge variant="highlight">Top 80%</Badge>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              { label: "Budgeting", accuracy: 85, color: "bg-primary" },
+              { label: "Investing", accuracy: 42, color: "bg-secondary" },
+              { label: "Saving", accuracy: 92, color: "bg-accent" },
+              { label: "Taxation", accuracy: 65, color: "bg-highlight" },
+            ].map((cat, i) => (
+              <div key={i} className="space-y-2">
+                <div className="flex justify-between text-sm font-black">
+                  <span className="text-slate-600 dark:text-slate-400 uppercase tracking-widest text-[10px]">{cat.label}</span>
+                  <span className="text-slate-800 dark:text-white">{cat.accuracy}%</span>
+                </div>
+                <div className="h-3 w-full bg-slate-100 dark:bg-dark-divider rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${cat.accuracy}%` }}
+                    transition={{ duration: 1, delay: i * 0.1 }}
+                    className={`h-full rounded-full ${cat.color} relative`}
+                  >
+                    <div className="absolute inset-0 bg-white/20" />
+                  </motion.div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Strengths & Weaknesses (Radar/Pie Alternative) */}
+        <Card variant="elevation" className="p-8 space-y-6">
+          <div className="space-y-1">
+            <h3 className="text-xl font-black text-slate-800 dark:text-white transition-colors">Financial Profile</h3>
+            <p className="text-sm font-bold text-slate-400 dark:text-slate-500 transition-colors">Strengths vs Weaknesses</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <p className="text-[10px] font-black text-green-500 uppercase tracking-[0.2em]">Strengths</p>
+              <div className="space-y-2">
+                {["Emergency Fund", "Debt Management", "Expense Tracking"].map((s, i) => (
+                  <div key={i} className="p-3 bg-green-500/10 border-2 border-green-500/20 rounded-xl flex items-center gap-2">
+                    <CheckCircle2 size={14} className="text-green-500" />
+                    <span className="text-xs font-bold text-green-700 dark:text-green-400">{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <p className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">Weak Areas</p>
+              <div className="space-y-2">
+                {["Stock Market", "Compound Interest", "Tax Planning"].map((w, i) => (
+                  <div key={i} className="p-3 bg-red-500/10 border-2 border-red-500/20 rounded-xl flex items-center gap-2">
+                    <XCircle size={14} className="text-red-500" />
+                    <span className="text-xs font-bold text-red-700 dark:text-red-400">{w}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t-2 border-slate-50 dark:border-dark-divider">
+            <div className="flex items-center gap-3 p-4 bg-primary/5 dark:bg-primary/10 rounded-2xl border-2 border-primary/10">
+              <Brain className="text-primary" size={20} />
+              <div>
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">AI Recommendation</p>
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-300">Focus on "Investing 101" to improve your overall score.</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </section>
+
       {/* Health & Insights Section */}
+
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Financial Health Score (Gauge Style) */}
         <Card variant="elevation" className="flex flex-col items-center justify-center text-center p-10 space-y-4">

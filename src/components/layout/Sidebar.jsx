@@ -1,15 +1,17 @@
 import { NavLink } from "react-router-dom";
-import { Home, BookOpen, ReceiptText, MessageSquare, PieChart, User, LogOut, Settings as SettingsIcon } from "lucide-react";
+import { Home, BookOpen, ReceiptText, MessageSquare, PieChart, User, LogOut, Trophy, Zap, Settings as SettingsIcon } from "lucide-react";
 import { cn } from "../../utils/cn";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: BookOpen, label: "Learn", path: "/learn" },
+  { icon: Trophy, label: "Leaderboard", path: "/leaderboard" },
   { icon: ReceiptText, label: "Transactions", path: "/transactions" },
   { icon: MessageSquare, label: "AI Coach", path: "/chat" },
   { icon: PieChart, label: "Insights", path: "/insights" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
+
 
 export const Sidebar = () => {
   return (
@@ -44,7 +46,28 @@ export const Sidebar = () => {
         ))}
       </nav>
 
+      <div className="px-6 py-4">
+        <div className="p-4 bg-slate-50 dark:bg-dark-secondary rounded-2xl border-2 border-slate-100 dark:border-dark-divider space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Level 7</span>
+            <div className="flex items-center gap-1 text-orange-500 font-black text-[10px] uppercase tracking-widest">
+              <Zap size={10} strokeWidth={3} /> 3 Day Streak
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="h-1.5 w-full bg-slate-200 dark:bg-dark-divider rounded-full overflow-hidden">
+              <div className="h-full bg-primary w-2/3 rounded-full" />
+            </div>
+            <div className="flex justify-between text-[10px] font-black text-slate-500">
+              <span>XP</span>
+              <span>2,450 / 3,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="p-4 border-t-2 border-slate-50 dark:border-dark-divider space-y-2">
+
         <NavLink
           to="/settings"
           className={({ isActive }) =>

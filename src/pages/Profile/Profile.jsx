@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { User, Award, Zap, Target, Star, Shield, TrendingUp, Settings, LogOut, Heart, Diamond } from "lucide-react";
+
 import { cn } from "../../utils/cn";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
@@ -61,8 +63,8 @@ export default function Profile() {
                </div>
 
                {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full -mr-32 -mt-32 pointer-events-none transition-colors" />
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-secondary/5 dark:bg-secondary/10 rounded-full -ml-16 -mb-16 pointer-events-none transition-colors" />
+               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full -mr-32 -mt-32 pointer-events-none transition-colors" />
+               <div className="absolute bottom-0 left-0 w-32 h-32 bg-secondary/5 dark:bg-secondary/10 rounded-full -ml-16 -mb-16 pointer-events-none transition-colors" />
             </Card>
          </section>
 
@@ -73,17 +75,38 @@ export default function Profile() {
                { label: "Total Saved", value: "$45.2k", icon: TrendingUp, color: "text-primary", bg: "bg-primary/10 dark:bg-primary/20" },
                { label: "Achievements", value: "12 / 48", icon: Award, color: "text-secondary", bg: "bg-secondary/10 dark:bg-secondary/20" },
                { label: "Global Rank", value: "#1,452", icon: Star, color: "text-accent", bg: "bg-accent/10 dark:bg-accent/20" },
-            ].map((stat, i) => (
-               <Card key={i} variant="outline" className="flex items-center gap-4 p-4 border-2 border-slate-50 dark:border-dark-divider hover:border-primary/20 dark:hover:border-primary/40 transition-all cursor-pointer">
-                  <div className={cn("p-3 rounded-2xl transition-colors", stat.bg, stat.color)}>
-                     <stat.icon size={24} strokeWidth={3} />
-                  </div>
-                  <div>
-                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 transition-colors">{stat.label}</p>
-                     <p className="text-xl font-black text-slate-800 dark:text-slate-100 transition-colors">{stat.value}</p>
-                  </div>
-               </Card>
-            ))}
+            ].map((stat, i) => {
+               const CardContent = (
+                  <>
+                     <div className={cn("p-3 rounded-2xl transition-colors", stat.bg, stat.color)}>
+                        <stat.icon size={24} strokeWidth={3} />
+                     </div>
+                     <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 transition-colors">{stat.label}</p>
+                        <p className="text-xl font-black text-slate-800 dark:text-slate-100 transition-colors">{stat.value}</p>
+                     </div>
+                  </>
+               );
+
+               const cardClass = "flex items-center gap-4 p-4 border-2 border-slate-50 dark:border-dark-divider hover:border-primary/20 dark:hover:border-primary/40 transition-all cursor-pointer h-full";
+
+               if (stat.label === "Global Rank") {
+                  return (
+                     <Link key={i} to="/leaderboard">
+                        <Card variant="outline" className={cardClass}>
+                           {CardContent}
+                        </Card>
+                     </Link>
+                  );
+               }
+
+               return (
+                  <Card key={i} variant="outline" className={cardClass}>
+                     {CardContent}
+                  </Card>
+               );
+            })}
+
          </section>
 
          {/* Badge Gallery */}
