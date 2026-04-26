@@ -25,6 +25,10 @@ A highly engaging, gamified financial literacy and AI coaching platform. Designe
 * **Mobile-First Design:** Features a dedicated `MobileNav` bottom bar for seamless smartphone navigation.
 * **Desktop Sidebar:** Persistent, smooth-transitioning `Sidebar` layout for wider screens.
 
+### ⚙️ Multi-Session AI Coach
+* **Contextual History:** Manage multiple coaching threads via a persistent sidebar.
+* **Smart Redirects:** Trigger deep-analysis sessions directly from Insights cards.
+
 ---
 
 ## 🛠️ Technology Stack
