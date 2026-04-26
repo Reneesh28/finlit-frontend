@@ -8,7 +8,8 @@ export const InsightCard = ({
   icon: Icon,
   status = "neutral",
   statusText,
-  className
+  className,
+  onClick
 }) => {
   const statusColors = {
     positive: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800/30",
@@ -39,7 +40,10 @@ export const InsightCard = ({
       </div>
 
       <div className="mt-2 pt-4 border-t-2 border-slate-50 dark:border-dark-divider">
-        <button className="text-xs font-black text-primary uppercase tracking-widest hover:text-primary-dark transition-colors cursor-pointer">
+        <button
+          onClick={onClick}
+          className="text-xs font-black text-primary uppercase tracking-widest hover:text-primary-dark transition-colors cursor-pointer"
+        >
           View Detail Analysis →
         </button>
       </div>

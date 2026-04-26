@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User, Award, Zap, Target, Star, Shield, TrendingUp, Settings, LogOut, Heart, Diamond } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getProfile } from "../../api/profileApi";
 
 import { cn } from "../../utils/cn";
 import { Card } from "../../components/ui/Card";
@@ -10,6 +12,29 @@ import { ProgressBar } from "../../components/ui/ProgressBar";
 import { BadgeItem } from "../../components/gamification/BadgeItem";
 
 export default function Profile() {
+   const navigate = useNavigate();
+   const [profile, setProfile] = useState(null);
+   const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+      const fetchProfile = async () => {
+         try {
+            const data = await getProfile();
+            setProfile(data.data);
+         } catch (error) {
+            console.error(error);
+         } finally {
+            setLoading(false);
+         }
+      };
+      fetchProfile();
+   }, []);
+
+   const handleLogout = () => {
+      localStorage.removeItem("token");
+      navigate("/auth/login");
+   };
+
    const badges = [
       { label: "Early Bird", description: "Saved $100 in your first week", icon: Zap, date: "Oct 12" },
       { label: "Budget Master", description: "Stayed under budget for 30 days", icon: Shield, date: "Sep 28" },
@@ -18,6 +43,12 @@ export default function Profile() {
       { label: "Safe Haven", description: "Built a 3-month emergency fund", icon: Heart, locked: true },
       { label: "Crypto King", description: "Invested in 5+ diverse assets", icon: Star, locked: true },
    ];
+
+   if (loading) return <div className="p-20 text-center font-black animate-pulse text-slate-400">LOADING YOUR PROFILE...</div>;
+
+   const userXP = profile?.xp || 0;
+   const userLevel = Math.floor(userXP / 1000) + 1;
+   const xpInLevel = userXP % 1000;
 
    return (
       <div className="space-y-8 pb-12 transition-colors duration-300">
@@ -38,27 +69,27 @@ export default function Profile() {
                   {/* User Info */}
                   <div className="flex-1 text-center md:text-left space-y-4">
                      <div>
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mb-2 transition-colors">Alex Johnson</h1>
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mb-2 transition-colors">{profile?.name || "User"}</h1>
                         <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                           <Badge variant="primary">Level 7 Expert</Badge>
+                           <Badge variant="primary">Level {userLevel} Explorer</Badge>
                            <Badge variant="secondary">Pro Member</Badge>
-                           <Badge variant="accent">Top 5% Saver</Badge>
+                           <Badge variant="accent">Financial Wizard</Badge>
                         </div>
                      </div>
 
                      <div className="space-y-2">
                         <div className="flex justify-between items-end text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 transition-colors">
                            <span>Experience Points (XP)</span>
-                           <span>2,450 / 3,000</span>
+                           <span>{userXP} / {(userLevel) * 1000}</span>
                         </div>
-                        <ProgressBar value={82} color="primary" height="h-6" />
+                        <ProgressBar value={(xpInLevel / 1000) * 100} color="primary" height="h-6" />
                      </div>
                   </div>
 
                   {/* Quick Actions */}
                   <div className="flex flex-col gap-2 w-full md:w-auto">
                      <Button variant="secondary" icon={Settings} className="w-full md:w-auto">Account Settings</Button>
-                     <Button variant="primary" icon={LogOut} className="w-full md:w-auto">Sign Out</Button>
+                     <Button variant="primary" icon={LogOut} onClick={handleLogout} className="w-full md:w-auto">Sign Out</Button>
                   </div>
                </div>
 
@@ -71,8 +102,8 @@ export default function Profile() {
          {/* Gamified Stats Row */}
          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-               { label: "Saving Streak", value: "5 Days", icon: Zap, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-500/10" },
-               { label: "Total Saved", value: "$45.2k", icon: TrendingUp, color: "text-primary", bg: "bg-primary/10 dark:bg-primary/20" },
+               { label: "Saving Streak", value: `${profile?.streak || 0} Days`, icon: Zap, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-500/10" },
+               { label: "Total Saved", value: `$${(profile?.totalSavings || 0).toLocaleString()}`, icon: TrendingUp, color: "text-primary", bg: "bg-primary/10 dark:bg-primary/20" },
                { label: "Achievements", value: "12 / 48", icon: Award, color: "text-secondary", bg: "bg-secondary/10 dark:bg-secondary/20" },
                { label: "Global Rank", value: "#1,452", icon: Star, color: "text-accent", bg: "bg-accent/10 dark:bg-accent/20" },
             ].map((stat, i) => {

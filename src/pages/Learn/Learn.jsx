@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Book, Target, Shield, Coins, TrendingUp, Star, Award } from "lucide-react";
+import { getProfile } from "../../api/profileApi";
 
 import { XPBar } from "../../components/gamification/XPBar";
 import { LearningPath } from "../../components/gamification/LearningPath";
@@ -22,6 +23,28 @@ const lessonsData = [
 export default function Learn() {
    const navigate = useNavigate();
    const [selectedLesson, setSelectedLesson] = useState(null);
+   const [profile, setProfile] = useState(null);
+   const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+      const fetchProfile = async () => {
+         try {
+            const data = await getProfile();
+            setProfile(data.data);
+         } catch (error) {
+            console.error(error);
+         } finally {
+            setLoading(false);
+         }
+      };
+      fetchProfile();
+   }, []);
+
+   if (loading) return <div className="p-20 text-center font-black animate-pulse text-slate-400">LOADING YOUR PATH...</div>;
+
+   const userXP = profile?.xp || 0;
+   const userLevel = Math.floor(userXP / 1000) + 1;
+   const xpInLevel = userXP % 1000;
 
 
    const handleNodeClick = (lesson) => {
@@ -32,7 +55,7 @@ export default function Learn() {
       <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto pb-12">
          {/* Learning Path Column */}
          <div className="flex-1 max-w-2xl mx-auto px-4">
-            <XPBar level={7} xp={2450} totalXp={3000} />
+            <XPBar level={userLevel} xp={xpInLevel} totalXp={1000} />
 
             <section className="bg-slate-50/50 dark:bg-dark-secondary/20 rounded-3xl border-2 border-slate-100 dark:border-dark-divider shadow-inner transition-colors duration-300">
                <LearningPath lessons={lessonsData} onNodeClick={handleNodeClick} />

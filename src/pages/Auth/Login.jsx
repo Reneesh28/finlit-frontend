@@ -1,19 +1,40 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Mail, Lock, LogIn, Award } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, LogIn, Award, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
+import { loginUser } from "../../api/authApi";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError(""); // Clear error when typing
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Simulation
-    setTimeout(() => setLoading(false), 1500);
+    setError("");
+
+    try {
+      await loginUser(formData);
+      navigate("/"); // Redirect to dashboard
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,11 +51,26 @@ export default function Login() {
 
         <Card variant="elevation" className="p-8 shadow-xl transition-colors">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 bg-red-50 dark:bg-red-950/20 border-2 border-red-200 dark:border-red-900/50 rounded-2xl flex items-center gap-3 text-red-600 dark:text-red-400 text-sm font-bold"
+              >
+                <AlertCircle size={20} />
+                {error}
+              </motion.div>
+            )}
+
             <Input
               label="Email Address"
               placeholder="name@example.com"
               type="email"
+              name="email"
               icon={Mail}
+              value={formData.email}
+              onChange={handleChange}
+              autoComplete="email"
               required
             />
 
@@ -43,7 +79,11 @@ export default function Login() {
                 label="Password"
                 placeholder="••••••••"
                 type="password"
+                name="password"
                 icon={Lock}
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="current-password"
                 required
               />
               <div className="text-right">

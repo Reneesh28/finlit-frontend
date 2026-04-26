@@ -4,18 +4,31 @@ import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Input } from "../../components/ui/Input";
 
-const leaderboardData = [
-  { rank: 1, name: "Sarah Chen", xp: 12450, streak: 42, trend: "up", isUser: false },
-  { rank: 2, name: "Alex Rivera", xp: 11200, streak: 15, trend: "same", isUser: true },
-  { rank: 3, name: "James Wilson", xp: 9800, streak: 28, trend: "down", isUser: false },
-  { rank: 4, name: "Emily Blunt", xp: 8500, streak: 12, trend: "up", isUser: false },
-  { rank: 5, name: "Michael Scott", xp: 7200, streak: 3, trend: "down", isUser: false },
-  { rank: 6, name: "Pam Beesly", xp: 6800, streak: 7, trend: "up", isUser: false },
-  { rank: 7, name: "Jim Halpert", xp: 6500, streak: 5, trend: "same", isUser: false },
-  { rank: 8, name: "Dwight Schrute", xp: 6100, streak: 30, trend: "up", isUser: false },
-];
+import { useEffect, useState } from "react";
+import { getLeaderboard } from "../../api/quizApi";
 
 export default function Leaderboard() {
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const data = await getLeaderboard();
+        setLeaderboard(data.data || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeaderboard();
+  }, []);
+
+  if (loading) return <div className="p-20 text-center font-black animate-pulse text-slate-400">LOADING THE LEGENDS...</div>;
+
+  const top3 = leaderboard.slice(0, 3);
+  const others = leaderboard.slice(3);
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 space-y-8">
       {/* Header Section */}
@@ -35,19 +48,18 @@ export default function Leaderboard() {
         </div>
       </header>
 
-      {/* Top 3 Podium */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end pt-8">
         {/* Rank 2 */}
         <div className="order-2 md:order-1">
-          <PodiumCard user={leaderboardData[1]} height="h-48" medal={<Medal className="text-slate-400" size={32} />} />
+          {top3[1] && <PodiumCard user={top3[1]} height="h-48" medal={<Medal className="text-slate-400" size={32} />} />}
         </div>
         {/* Rank 1 */}
         <div className="order-1 md:order-2">
-          <PodiumCard user={leaderboardData[0]} height="h-64" medal={<Crown className="text-amber-400" size={48} />} isGold />
+          {top3[0] && <PodiumCard user={top3[0]} height="h-64" medal={<Crown className="text-amber-400" size={48} />} isGold />}
         </div>
         {/* Rank 3 */}
         <div className="order-3 md:order-3">
-          <PodiumCard user={leaderboardData[2]} height="h-40" medal={<Medal className="text-amber-700" size={32} />} />
+          {top3[2] && <PodiumCard user={top3[2]} height="h-40" medal={<Medal className="text-amber-700" size={32} />} />}
         </div>
       </section>
 
@@ -61,15 +73,15 @@ export default function Leaderboard() {
         </div>
 
         <div className="divide-y-2 divide-slate-50 dark:divide-dark-divider">
-          {leaderboardData.slice(3).map((user, i) => (
+          {others.map((user, i) => (
             <motion.div
-              key={user.rank}
+              key={user._id || user.rank}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
               className={`p-4 grid grid-cols-12 items-center hover:bg-slate-50 dark:hover:bg-dark-secondary/30 transition-colors ${user.isUser ? 'bg-primary/5 border-l-4 border-primary' : ''}`}
             >
-              <div className="col-span-1 text-center font-black text-slate-400">{user.rank}</div>
+              <div className="col-span-1 text-center font-black text-slate-400">{i + 4}</div>
               <div className="col-span-6 pl-4 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-dark-divider flex items-center justify-center font-black text-slate-500">
                   {user.name.charAt(0)}

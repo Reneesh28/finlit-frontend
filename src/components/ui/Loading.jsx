@@ -41,3 +41,19 @@ export const LoadingSpinner = ({ size = "md", color = "primary" }) => {
     <div className={`${sizes[size]} ${colors[color]} rounded-full animate-spin`} />
   );
 };
+
+export const Loading = ({ fullPage = false }) => {
+  if (fullPage) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-dark-primary/80 backdrop-blur-sm transition-colors">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center p-8">
+      <LoadingSpinner />
+    </div>
+  );
+};

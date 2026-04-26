@@ -1,20 +1,61 @@
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Wallet, TrendingUp, CreditCard, Sparkles, ArrowRight, Award, Zap, CheckCircle2, XCircle, Brain } from "lucide-react";
+import {
+  Wallet,
+  TrendingUp,
+  CreditCard,
+  Sparkles,
+  ArrowRight,
+  Award,
+  Zap,
+  CheckCircle2,
+  XCircle,
+  Brain,
+  ArrowUpRight,
+  Target,
+  Flame,
+  LayoutGrid
+} from "lucide-react";
 
+import { cn } from "../../utils/cn";
 import { Card } from "../../components/ui/Card";
+
 import { Button } from "../../components/ui/Button";
 import { StatCard } from "../../components/ui/StatCard";
 import { ProgressBar } from "../../components/ui/ProgressBar";
 import { Badge } from "../../components/ui/Badge";
+import { useEffect, useState } from "react";
+import { getProfile } from "../../api/profileApi";
+import { getBudgets } from "../../api/budgetApi";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [budgets, setBudgets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [profileRes, budgetRes] = await Promise.all([
+          getProfile(),
+          getBudgets()
+        ]);
+        setProfile(profileRes.data);
+        setBudgets(budgetRes.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
   const container = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+      transition: { staggerChildren: 0.1 }
     }
   };
 
@@ -23,86 +64,199 @@ export default function Dashboard() {
     show: { y: 0, opacity: 1 }
   };
 
+  if (loading) return <div className="p-20 text-center font-black animate-pulse text-slate-400">LOADING YOUR INTELLIGENCE...</div>;
+
   return (
     <motion.div
       variants={container}
       initial="hidden"
       animate="show"
-      className="space-y-8 pb-12"
+      className="space-y-10 pb-20"
     >
-      {/* Hero Section */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="space-y-1">
-          <Badge variant="accent" icon={Zap}>Level 4 Explorer</Badge>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight transition-colors">
-            Welcome back, <span className="text-primary italic text-2xl">Alex!</span> 👋
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 font-bold transition-colors">You're on a 5-day saving streak. Keep it up!</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" size="sm" className="hidden sm:flex">Download Report</Button>
-          <Button variant="primary" size="sm">Add Expense</Button>
-        </div>
-      </header>
+      {/* 1. HERO SECTION - EMOTIONAL SUMMARY */}
+      <motion.section variants={item} className="relative overflow-hidden rounded-[3rem] bg-slate-900 dark:bg-dark-secondary p-8 md:p-12 text-white shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] -mr-48 -mt-48" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/10 rounded-full blur-[80px] -ml-32 -mb-32" />
 
-      {/* Main Stats Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+          <div className="space-y-4 max-w-xl">
+            <Badge variant="secondary" icon={Flame} className="bg-secondary/20 text-secondary border-secondary/30">
+              {profile?.streak || 0} Day Streak
+            </Badge>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-none">
+              You're <span className="text-secondary italic">crushing it</span>, {profile?.name?.split(" ")[0] || "User"}! 🚀
+            </h1>
+            <p className="text-lg font-bold text-slate-400 leading-relaxed">
+              You've saved <span className="text-white">${(profile?.totalSavings || 0).toLocaleString()}</span> total. You're making excellent progress on your financial freedom!
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Button variant="primary" className="h-12 px-8 rounded-2xl shadow-lg shadow-primary/30">
+                View Breakdown
+              </Button>
+              <Button variant="ghost" className="h-12 px-8 rounded-2xl text-white hover:bg-white/10">
+                Plan Next Month
+              </Button>
+            </div>
+          </div>
+
+          <div className="hidden lg:block w-px h-32 bg-slate-700/50" />
+
+          <div className="grid grid-cols-2 gap-8">
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Financial Health</p>
+              <p className="text-4xl font-black text-secondary">742</p>
+              <p className="text-[10px] font-bold text-slate-400">+12 pts this week</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Total Net Worth</p>
+              <p className="text-4xl font-black text-white">${(profile?.totalSavings || 0).toLocaleString()}</p>
+              <p className="text-[10px] font-bold text-slate-400">Rank: #1,452</p>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* 2. KEY STATS - VISUAL HIERARCHY */}
+      <motion.section variants={item} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          label="Total Balance"
-          value="$12,450.00"
+          label="Available Balance"
+          value={`$${(profile?.totalSavings || 0).toLocaleString()}`}
           icon={Wallet}
           trend="up"
           trendValue={12}
+          story="Ready for your next goal"
           color="primary"
         />
         <StatCard
           label="Monthly Spending"
-          value="$2,140.00"
+          value="$2,140"
           icon={CreditCard}
           trend="down"
           trendValue={5}
+          story="5.2% below budget"
           color="secondary"
         />
         <StatCard
-          label="Savings Goal"
-          value="$8,200.00"
-          icon={Award}
+          label="Emergency Fund"
+          value="$8,200"
+          icon={Target}
+          story="3.2 months covered"
           color="accent"
         />
-      </section>
+        <StatCard
+          label="Knowledge Level"
+          value={`Level ${Math.floor((profile?.xp || 0) / 1000) + 1}`}
+          icon={Brain}
+          story="Top 15% in community"
+          color="warning"
+        />
+      </motion.section>
 
-      {/* Knowledge & Analytics Section */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Category Accuracy (Bar Chart) */}
-        <Card variant="elevation" className="p-8 space-y-6">
-          <div className="flex justify-between items-end">
-            <div className="space-y-1">
-              <h3 className="text-xl font-black text-slate-800 dark:text-white transition-colors">Knowledge Breakdown</h3>
-              <p className="text-sm font-bold text-slate-400 dark:text-slate-500 transition-colors">Accuracy by category</p>
-            </div>
-            <Badge variant="highlight">Top 80%</Badge>
+      {/* 3. SMART INSIGHTS - VISUAL MEANING */}
+      <motion.section variants={item} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between px-2">
+            <h2 className="text-2xl font-black tracking-tight text-slate-800 dark:text-white flex items-center gap-2">
+              <Sparkles className="text-primary" /> Intelligence Feed
+            </h2>
+            <button className="text-sm font-black text-primary hover:underline">View All Insights</button>
           </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card variant="highlight" className="p-6 space-y-4 border-l-8 border-secondary border-2 transition-transform hover:scale-[1.02]">
+              <div className="flex justify-between items-start">
+                <div className="p-3 bg-secondary/10 text-secondary rounded-2xl">
+                  <TrendingUp size={24} />
+                </div>
+                <Badge variant="secondary">Positive</Badge>
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-lg font-black text-slate-800 dark:text-white">Compound Growth Alert</h4>
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Your $2k in high-yield savings earned $12.50 this month. If you add $200/mo, you'll reach $10k in 3 years.
+                </p>
+              </div>
+              <Button variant="primary" size="sm" className="w-full">Auto-Invest Now</Button>
+            </Card>
+
+            <Card variant="highlight" className="p-6 space-y-4 border-l-8 border-accent border-2 transition-transform hover:scale-[1.02]">
+              <div className="flex justify-between items-start">
+                <div className="p-3 bg-accent/10 text-accent rounded-2xl">
+                  <XCircle size={24} />
+                </div>
+                <Badge variant="accent">Action Required</Badge>
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-lg font-black text-slate-800 dark:text-white">Unused Subscription</h4>
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 leading-relaxed">
+                  We detected a $14.99 charge from "StreamBox". You haven't used this service in 45 days.
+                </p>
+              </div>
+              <Button variant="accent" size="sm" className="w-full">Cancel Subscription</Button>
+            </Card>
+          </div>
+        </div>
+
+        {/* 4. PROGRESS TRACKING */}
+        <div className="space-y-6">
+          <div className="px-2">
+            <h2 className="text-2xl font-black tracking-tight text-slate-800 dark:text-white flex items-center gap-2">
+              <Target className="text-secondary" /> Active Goals
+            </h2>
+          </div>
+
+          <Card variant="elevation" className="p-6 space-y-6">
+            <div className="space-y-4">
+              {budgets.length > 0 ? budgets.map((goal, i) => (
+                <div key={i} className="space-y-2">
+                  <div className="flex justify-between items-end">
+                    <span className="text-sm font-black text-slate-700 dark:text-slate-200">{goal.category}</span>
+                    <span className="text-xs font-bold text-slate-400">${(goal.spent || 0).toLocaleString()} / ${(goal.amount || 0).toLocaleString()}</span>
+                  </div>
+                  <ProgressBar value={((goal.spent || 0) / (goal.amount || 1)) * 100} color={i % 2 === 0 ? "primary" : "secondary"} height="h-3" />
+                </div>
+              )) : (
+                <p className="text-sm font-bold text-slate-400 text-center py-4">No active goals found. Start by setting a budget!</p>
+              )}
+            </div>
+            <Button variant="outline" className="w-full h-12 rounded-2xl" onClick={() => navigate("/insights")}>Manage All Goals</Button>
+          </Card>
+        </div>
+      </motion.section>
+
+      {/* 5. CHARTS & ANALYTICS */}
+      <motion.section variants={item} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card variant="glass" className="p-8 space-y-6">
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <h3 className="text-xl font-black text-slate-800 dark:text-white">Knowledge Mastery</h3>
+              <p className="text-sm font-bold text-slate-400">Your performance across categories</p>
+            </div>
+            <div className="p-3 bg-primary/10 text-primary rounded-2xl">
+              <LayoutGrid size={24} />
+            </div>
+          </div>
+
+          <div className="space-y-5">
             {[
               { label: "Budgeting", accuracy: 85, color: "bg-primary" },
               { label: "Investing", accuracy: 42, color: "bg-secondary" },
               { label: "Saving", accuracy: 92, color: "bg-accent" },
-              { label: "Taxation", accuracy: 65, color: "bg-highlight" },
+              { label: "Taxation", accuracy: 65, color: "bg-info" },
             ].map((cat, i) => (
               <div key={i} className="space-y-2">
-                <div className="flex justify-between text-sm font-black">
-                  <span className="text-slate-600 dark:text-slate-400 uppercase tracking-widest text-[10px]">{cat.label}</span>
+                <div className="flex justify-between text-xs font-black uppercase tracking-widest text-slate-500">
+                  <span>{cat.label}</span>
                   <span className="text-slate-800 dark:text-white">{cat.accuracy}%</span>
                 </div>
-                <div className="h-3 w-full bg-slate-100 dark:bg-dark-divider rounded-full overflow-hidden">
+                <div className="h-4 w-full bg-slate-100 dark:bg-dark-border rounded-full overflow-hidden p-1">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${cat.accuracy}%` }}
                     transition={{ duration: 1, delay: i * 0.1 }}
-                    className={`h-full rounded-full ${cat.color} relative`}
+                    className={cn("h-full rounded-full shadow-inner relative", cat.color)}
                   >
-                    <div className="absolute inset-0 bg-white/20" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent" />
                   </motion.div>
                 </div>
               </div>
@@ -110,130 +264,44 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        {/* Strengths & Weaknesses (Radar/Pie Alternative) */}
-        <Card variant="elevation" className="p-8 space-y-6">
-          <div className="space-y-1">
-            <h3 className="text-xl font-black text-slate-800 dark:text-white transition-colors">Financial Profile</h3>
-            <p className="text-sm font-bold text-slate-400 dark:text-slate-500 transition-colors">Strengths vs Weaknesses</p>
+        <Card variant="elevation" className="p-8 space-y-6 bg-gradient-to-br from-white to-slate-50 dark:from-dark-card dark:to-dark-secondary">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h3 className="text-xl font-black text-slate-800 dark:text-white">AI Coach Insights</h3>
+              <p className="text-sm font-bold text-slate-400">Predictive spending analysis</p>
+            </div>
+            <Badge variant="accent" icon={Brain}>Live Analysis</Badge>
+          </div>
+
+          <div className="p-6 bg-white dark:bg-dark-card rounded-3xl border-2 border-slate-100 dark:border-dark-border space-y-4">
+            <div className="flex gap-4">
+              <div className="w-12 h-12 bg-primary/20 text-primary rounded-2xl flex items-center justify-center shrink-0">
+                <ArrowUpRight size={24} strokeWidth={3} />
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-bold text-slate-600 dark:text-slate-300 leading-relaxed">
+                  "Based on your current trajectory, you'll have <span className="text-primary font-black">$450 surplus</span> by the end of the month. I recommend moving <span className="text-secondary font-black">$300</span> to your 'Europe Trip' goal."
+                </p>
+                <div className="flex gap-2">
+                  <Button variant="primary" size="sm">Accept Plan</Button>
+                  <Button variant="ghost" size="sm">Dismiss</Button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-4">
-              <p className="text-[10px] font-black text-green-500 uppercase tracking-[0.2em]">Strengths</p>
-              <div className="space-y-2">
-                {["Emergency Fund", "Debt Management", "Expense Tracking"].map((s, i) => (
-                  <div key={i} className="p-3 bg-green-500/10 border-2 border-green-500/20 rounded-xl flex items-center gap-2">
-                    <CheckCircle2 size={14} className="text-green-500" />
-                    <span className="text-xs font-bold text-green-700 dark:text-green-400">{s}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-4">
-              <p className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">Weak Areas</p>
-              <div className="space-y-2">
-                {["Stock Market", "Compound Interest", "Tax Planning"].map((w, i) => (
-                  <div key={i} className="p-3 bg-red-500/10 border-2 border-red-500/20 rounded-xl flex items-center gap-2">
-                    <XCircle size={14} className="text-red-500" />
-                    <span className="text-xs font-bold text-red-700 dark:text-red-400">{w}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t-2 border-slate-50 dark:border-dark-divider">
-            <div className="flex items-center gap-3 p-4 bg-primary/5 dark:bg-primary/10 rounded-2xl border-2 border-primary/10">
-              <Brain className="text-primary" size={20} />
-              <div>
-                <p className="text-[10px] font-black text-primary uppercase tracking-widest">AI Recommendation</p>
-                <p className="text-xs font-bold text-slate-600 dark:text-slate-300">Focus on "Investing 101" to improve your overall score.</p>
-              </div>
-            </div>
+            <Card variant="outline" className="p-4 space-y-2">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Est. Monthly Savings</p>
+              <p className="text-2xl font-black text-secondary">$1,452</p>
+            </Card>
+            <Card variant="outline" className="p-4 space-y-2">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Savings Rate</p>
+              <p className="text-2xl font-black text-primary">24.5%</p>
+            </Card>
           </div>
         </Card>
-      </section>
-
-      {/* Health & Insights Section */}
-
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Financial Health Score (Gauge Style) */}
-        <Card variant="elevation" className="flex flex-col items-center justify-center text-center p-10 space-y-4">
-          <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 transition-colors">Financial Health Score</h3>
-          <div className="relative w-48 h-48 flex items-center justify-center">
-            {/* SVG Gauge Placeholder */}
-            <svg className="w-full h-full transform -rotate-90">
-              <circle cx="96" cy="96" r="80" stroke="currentColor" strokeWidth="16" fill="transparent" className="text-slate-100 dark:text-dark-divider" />
-              <circle cx="96" cy="96" r="80" stroke="currentColor" strokeWidth="16" fill="transparent" className="text-primary" strokeDasharray={500} strokeDashoffset={120} strokeLinecap="round" />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-5xl font-black text-slate-900 dark:text-white transition-colors">742</span>
-              <span className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors">Excellent</span>
-            </div>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 font-bold px-4 transition-colors">
-            Your score increased by <span className="text-primary">12 points</span> since your last budget review!
-          </p>
-        </Card>
-
-        {/* AI Insight Card */}
-        <Card variant="elevation" className="bg-accent/5 dark:bg-accent/10 border-accent/20 dark:border-accent/30 flex flex-col justify-between transition-colors">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-accent/10 dark:bg-accent/20 rounded-2xl text-accent">
-                <Sparkles size={24} strokeWidth={3} />
-              </div>
-              <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 transition-colors">AI Coach Advice</h3>
-            </div>
-            <p className="text-slate-600 dark:text-slate-300 font-bold leading-relaxed transition-colors">
-              "Hey Alex! It looks like you've spent 20% less on dining out this week. If you redirect that $150 to your 'Emergency Fund', you'll reach your 3-month goal by next Friday!"
-            </p>
-          </div>
-
-          <div className="mt-6 pt-6 border-t-2 border-accent/10">
-            <Button variant="accent" className="w-full justify-between">
-              <span>Accept Suggestion</span>
-              <ArrowRight size={20} strokeWidth={3} />
-            </Button>
-          </div>
-        </Card>
-      </section>
-
-      {/* Progress & Goals */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card variant="elevation" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 transition-colors">Goal Progress</h3>
-            <Badge variant="highlight">Car Fund</Badge>
-          </div>
-          <div className="space-y-4">
-            <div className="flex justify-between items-end">
-              <div>
-                <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors">Saved</p>
-                <p className="text-2xl font-black text-slate-800 dark:text-slate-100 transition-colors">$18,500 <span className="text-sm font-bold text-slate-400 italic">/ $25,000</span></p>
-              </div>
-              <p className="text-primary font-black transition-colors">74%</p>
-            </div>
-            <ProgressBar value={74} color="primary" height="h-6" />
-          </div>
-        </Card>
-
-        <Card variant="elevation" className="space-y-4">
-          <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 transition-colors">Recent Milestones</h3>
-          <div className="space-y-4">
-            {[
-              { icon: CheckCircle2, text: "Reached Weekly Savings Target", color: "text-green-500" },
-              { icon: Award, text: "Achieved 'Budget Master' Badge", color: "text-primary" },
-              { icon: Zap, text: "5-Day Streak Maintained", color: "text-orange-500" },
-            ].map((m, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-dark-secondary rounded-2xl border-2 border-slate-100 dark:border-dark-divider transition-colors">
-                <m.icon size={20} className={m.color} strokeWidth={3} />
-                <span className="font-bold text-slate-700 dark:text-slate-200 transition-colors">{m.text}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </section>
+      </motion.section>
     </motion.div>
   );
 }

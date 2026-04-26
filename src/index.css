@@ -1,42 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors - Gamified & Bright */
-  --color-primary: #58cc02;
-  /* Duolingo Green - Savings/Growth */
-  --color-primary-dark: #46a302;
-  --color-secondary: #2b70c9;
-  /* Trust Blue */
-  --color-accent: #a855f7;
-  /* Purple - AI Intelligence */
-  --color-warning: #ff4b4b;
-  /* Red */
-  --color-highlight: #ffc800;
-  /* Yellow */
-  --color-success: #58cc02;
+  /* Colors - Premium Fintech Palette */
+  --color-primary: #6366f1;
+  --color-primary-dark: #4f46e5;
+  --color-secondary: #10b981;
+  --color-secondary-dark: #059669;
+  --color-accent: #f43f5e;
+  --color-info: #0ea5e9;
+  --color-warning: #f59e0b;
 
   /* Backgrounds */
   --color-bg-base: #ffffff;
-  --color-bg-soft: #f7f7f7;
+  --color-bg-soft: #f8fafc;
 
-  /* Dark Mode specific (from guide) */
-  --color-dark-primary: #0f172a;
-  --color-dark-secondary: #1e293b;
-  --color-dark-card: #111827;
-  --color-dark-elevated: #1f2937;
-  --color-dark-border: #334155;
-  --color-dark-divider: #1e293b;
+  /* Dark Mode - Deep Ocean Slate */
+  --color-dark-primary: #020617;
+  --color-dark-secondary: #0f172a;
+  --color-dark-card: #1e293b;
+  --color-dark-border: #1e293b;
+  --color-dark-divider: #334155;
 
   /* Borders & Shadows */
-  --radius-2xl: 1.5rem;
+  --radius-2xl: 1.25rem;
   --radius-3xl: 2rem;
-  --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-bright: 0 4px 0px 0px rgba(0, 0, 0, 0.1);
-  /* Duolingo-style bottom "border" shadow */
-
-  /* Animations */
+  --shadow-premium: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   --animate-bounce-subtle: bounce-subtle 2s infinite;
 }
+
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -53,18 +44,39 @@
 }
 
 @layer base {
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    /* 🚨 prevent global scroll */
+    @apply bg-bg-soft dark:bg-dark-primary;
+  }
+
   body {
-    @apply bg-bg-soft text-slate-900 font-sans antialiased transition-colors duration-300;
+    @apply text-slate-900 font-sans antialiased transition-colors duration-300;
     -webkit-tap-highlight-color: transparent;
   }
 
   /* Apply dark mode styles to document */
   .dark body {
-    @apply bg-dark-primary text-slate-50;
+    @apply text-slate-50;
   }
 }
 
+
 @layer components {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   .btn-shadow {
     box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.2);
   }

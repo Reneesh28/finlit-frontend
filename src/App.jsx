@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { MainLayout } from "./components/layout/MainLayout";
 
 // Lazy loading placeholders
@@ -14,14 +15,26 @@ import Register from "./pages/Auth/Register";
 import Quiz from "./pages/Learn/Quiz";
 import Leaderboard from "./pages/Profile/Leaderboard";
 
-
-
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem("token"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   return (
     <Router>
       <Routes>
         {/* Main App Routes */}
-        <Route path="/" element={<MainLayout />}>
+        <Route 
+          path="/" 
+          element={isAuthenticated ? <MainLayout /> : <Navigate to="/auth/login" />}
+        >
           <Route index element={<Dashboard />} />
           <Route path="learn" element={<Learn />} />
           <Route path="learn/quiz" element={<Quiz />} />
@@ -37,8 +50,8 @@ function App() {
 
         {/* Auth Routes */}
         <Route path="/auth">
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
+          <Route path="login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+          <Route path="register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
         </Route>
       </Routes>
     </Router>
